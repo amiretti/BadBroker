@@ -5,10 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="ExternalServices\Repositories\" />
     <Folder Include="ConfigurationParameters\" />
-    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BadBroker.Models\BadBroker.Models.csproj" />
   </ItemGroup>
 
 </Project>

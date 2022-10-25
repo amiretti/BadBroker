@@ -6,10 +6,7 @@ namespace BadBroker.Application.Dtos
 {
     public class BestRateDto
     {
-        public BestRateDto()
-        {
-            Rates = new List<RateDto>();
-        }
+        public BestRateDto() { }
 
         [JsonPropertyName("rates")]
         public List<RateDto> Rates { get; set; }
