@@ -1,12 +1,6 @@
-﻿using BadBroker.Application.Commands.Interfaces;
-using BadBroker.Application.Dtos;
-using BadBroker.Infrastructure.Configuration;
-using Microsoft.AspNetCore.Http;
+﻿using BadBroker.API.ViewModels;
+using BadBroker.Application.Commands.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BadBroker.API.Controllers
@@ -15,12 +9,10 @@ namespace BadBroker.API.Controllers
     [Route("[controller]")]
     public class RatesController : ControllerBase
     {
-        private readonly IConfiguration _config;
         private readonly IGetTheBestRateCommand _getTheBestRateCommand;
 
-        public RatesController(IConfiguration config, IGetTheBestRateCommand getTheBestRateCommand)
+        public RatesController(IGetTheBestRateCommand getTheBestRateCommand)
         {
-            _config = config;
             _getTheBestRateCommand = getTheBestRateCommand;
         }
         /// <summary>
@@ -31,24 +23,17 @@ namespace BadBroker.API.Controllers
         /// <param name="moneyUsd"></param>
         /// <returns></returns>
         [HttpGet("best")]
-        public async Task<ActionResult> GetBest([FromQuery] string startDate, [FromQuery] string endDate, [FromQuery] string moneyUsd)
+        public async Task<ActionResult> GetBest([FromQuery] FilterViewModel filter)
         {
-            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate) || string.IsNullOrEmpty(moneyUsd))
-            {
-                return BadRequest("Yo should specify start date, end date and amount (in U$D)");
-            }
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-            await _getTheBestRateCommand.Configure(new Models.Filter() { EndDate = endDate, StartDate = startDate, Amount = moneyUsd })
-                                        .Execute();
+            await _getTheBestRateCommand.Configure(filter.ToModel()).Execute();
 
             if (_getTheBestRateCommand.Success)
-            {
                 return Ok(_getTheBestRateCommand.Response);
-            }
             else
-            {
                 return StatusCode(500, _getTheBestRateCommand.Message);
-            }
         }
     }
 }

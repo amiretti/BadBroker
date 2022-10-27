@@ -4,6 +4,7 @@ namespace BadBroker.Models
 {
     public class Filter
     {
+
         [JsonPropertyName("startDate")]
         public string StartDate { get; set; }
 

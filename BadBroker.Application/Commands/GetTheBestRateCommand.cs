@@ -1,6 +1,8 @@
 ﻿using BadBroker.Application.Commands.Interfaces;
 using BadBroker.Application.Dtos;
 using BadBroker.Application.ExternalServices.Repositories;
+using BadBroker.Application.Helpers;
+using BadBroker.Application.Validations;
 using BadBroker.Models;
 using System;
 using System.Collections.Generic;
@@ -32,13 +34,22 @@ namespace BadBroker.Application.Commands
         {
             try
             {
-                var result = await _repository.GetTimeSeries(_filter);
-
-                if (result.Success)
+                var validations = new FilterValidations();
+                var validationResponse = await validations.Validate(_filter);
+                if (validationResponse.Count > 0)
                 {
-                    Response = GetBestRate(result);
-                    Response.Revenue = Response.Revenue - double.Parse(_filter.Amount);
-                    Success = true;
+                    Success = false;
+                    Message = string.Join(" | ", validationResponse);
+                }
+                else
+                {
+                    var result = await _repository.GetTimeSeries(_filter);
+                    if (result.Success)
+                    {
+                        Response = GetBestRate(result);
+                        Response.Revenue = Response.Revenue - double.Parse(_filter.Amount);
+                        Success = true;
+                    }
                 }
             }
             catch (Exception ex)
